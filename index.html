@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>SK-Coding | Learn Code & App Dev</title>
+  <!-- Google Fonts & Font Awesome -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: radial-gradient(circle at 10% 20%, rgba(0, 20, 40, 0.95), rgba(0, 5, 15, 0.98));
+      color: #f0f4fa;
+      line-height: 1.5;
+      scroll-behavior: smooth;
+      overflow-x: hidden;
+    }
+
+    /* Glassmorphism + transparent UI elements */
+    .glass-card, .course-card, .step-card, .lesson-container, .modal-content, .code-editor-panel {
+      background: rgba(15, 30, 55, 0.55);
+      backdrop-filter: blur(12px);
+      border-radius: 28px;
+      border: 1px solid rgba(72, 187, 255, 0.25);
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.2);
+      transition: all 0.3s ease;
+    }
+
+    /* parallax scrolling effect (hero) */
+    .parallax-hero {
+      background: linear-gradient(135deg, rgba(2, 30, 55, 0.7), rgba(0, 80, 120, 0.5)), url('https://images.unsplash.com/photo-1517694712202-14dd9538aa97?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80') no-repeat center center fixed;
+      background-size: cover;
+      background-attachment: fixed;
+      position: relative;
+    }
+
+    /* modern button style */
+    .btn {
+      display: inline-block;
+      padding: 12px 28px;
+      border-radius: 40px;
+      font-weight: 600;
+      text-decoration: none;
+      transition: all 0.25s ease;
+      cursor: pointer;
+      border: none;
+      font-family: inherit;
+      font-size: 0.95rem;
+      background: rgba(0, 160, 255, 0.85);
+      color: white;
+      backdrop-filter: blur(4px);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    }
+
+    .btn:hover {
+      transform: scale(1.05);
+      background: #00aaff;
+      box-shadow: 0 8px 20px rgba(0,160,255,0.3);
+    }
+
+    .btn-outline {
+      background: transparent;
+      border: 1.5px solid #4c9aff;
+      color: #c0e2ff;
+    }
+
+    .btn-outline:hover {
+      background: rgba(76, 154, 255, 0.2);
+      transform: scale(1.02);
+    }
+
+    /* navigation */
+    nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 2rem;
+      flex-wrap: wrap;
+      background: rgba(5, 15, 25, 0.65);
+      backdrop-filter: blur(14px);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .logo {
+      font-size: 1.8rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #90e0ff, #3a86ff);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 1.8rem;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .nav-links a {
+      color: #eef5ff;
+      text-decoration: none;
+      font-weight: 500;
+      transition: 0.2s;
+    }
+
+    .nav-links a:hover { color: #7bcbff; }
+
+    /* hero section */
+    .hero {
+      min-height: 90vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 2rem;
+    }
+    .hero-content h1 {
+      font-size: clamp(2.5rem, 8vw, 4.5rem);
+      font-weight: 800;
+      animation: fadeUp 0.8s ease-out;
+    }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(30px);}
+      to { opacity: 1; transform: translateY(0);}
+    }
+    .cta-button {
+      margin-top: 2rem;
+    }
+
+    /* sections */
+    section {
+      padding: 5rem 2rem;
+    }
+    .container {
+      max-width: 1300px;
+      margin: 0 auto;
+    }
+    .section-title {
+      text-align: center;
+      font-size: 2.5rem;
+      margin-bottom: 3rem;
+      background: linear-gradient(120deg, #ffffff, #8fcbff);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    /* how it works steps */
+    .steps-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 2rem;
+      justify-content: center;
+    }
+    .step-card {
+      flex: 1;
+      min-width: 220px;
+      padding: 2rem;
+      text-align: center;
+      transition: transform 0.3s, backdrop-filter 0.3s;
+    }
+    .step-card:hover { transform: translateY(-10px); background: rgba(30, 55, 90, 0.7);}
+    .step-icon { font-size: 3rem; margin-bottom: 1rem; color: #5bbdff;}
+
+    /* courses grid */
+    .courses-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 2rem;
+      margin-top: 2rem;
+    }
+    .course-card {
+      padding: 1.8rem;
+      transition: all 0.3s ease;
+      position: relative;
+    }
+    .course-card:hover { transform: scale(1.02); background: rgba(40, 70, 110, 0.7); border-color: #3a86ff; }
+    .premium-badge {
+      position: absolute;
+      top: 16px;
+      right: 20px;
+      background: gold;
+      color: #1e2a3a;
+      padding: 4px 12px;
+      border-radius: 40px;
+      font-size: 0.7rem;
+      font-weight: bold;
+    }
+    .locked-badge {
+      background: #dc3545;
+    }
+    .btn-learn { margin-top: 1rem; padding: 8px 20px; font-size: 0.85rem;}
+
+    /* lesson container */
+    .lesson-page {
+      max-width: 1200px;
+      margin: 2rem auto;
+      padding: 0 1rem;
+    }
+    .lesson-content {
+      padding: 2rem;
+      margin-bottom: 2rem;
+    }
+    .code-editor-panel {
+      margin-top: 2rem;
+      padding: 1.5rem;
+    }
+    textarea.code-input {
+      width: 100%;
+      height: 180px;
+      background: #0a0f1c;
+      color: #d6eaff;
+      border: 1px solid #2c4f7a;
+      border-radius: 20px;
+      padding: 1rem;
+      font-family: monospace;
+      font-size: 0.9rem;
+      resize: vertical;
+    }
+    .preview-frame {
+      background: white;
+      border-radius: 20px;
+      width: 100%;
+      height: 220px;
+      border: none;
+      margin-top: 1rem;
+    }
+    .progress-bar-container {
+      background: #2a3a55;
+      border-radius: 30px;
+      height: 12px;
+      width: 100%;
+      margin: 1rem 0;
+    }
+    .progress-fill {
+      background: #3a86ff;
+      width: 0%;
+      height: 12px;
+      border-radius: 30px;
+      transition: width 0.3s;
+    }
+    .account-info {
+      background: rgba(10, 25, 45, 0.7);
+      border-radius: 30px;
+      padding: 1.5rem;
+      margin-top: 2rem;
+    }
+
+    /* modal */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.6);
+      backdrop-filter: blur(10px);
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+    .modal-content {
+      max-width: 400px;
+      width: 90%;
+      padding: 2rem;
+      background: rgba(25, 40, 60, 0.9);
+    }
+    .modal input {
+      width: 100%;
+      margin: 0.8rem 0;
+      padding: 12px;
+      border-radius: 30px;
+      border: none;
+      background: #eef3fc;
+    }
+
+    footer {
+      text-align: center;
+      padding: 2rem;
+      background: rgba(0,0,0,0.4);
+      font-size: 0.9rem;
+    }
+    @media (max-width: 760px) {
+      nav { flex-direction: column; gap: 1rem; }
+      .nav-links { justify-content: center; }
+      section { padding: 3rem 1rem; }
+    }
+    button:disabled { opacity: 0.6; cursor: not-allowed; }
+    .certificate-btn { background: #28a745; margin-left: 1rem; }
+  </style>
+</head>
+<body>
+
+<nav>
+  <div class="logo"><i class="fab fa-python"></i> SK-Coding</div>
+  <div class="nav-links">
+    <a href="#" data-nav="home">Home</a>
+    <a href="#" data-nav="courses">Courses</a>
+    <a href="#" data-nav="dashboard">Dashboard</a>
+    <span id="authButtons">
+      <button class="btn-outline" id="loginBtn">Log In</button>
+      <button class="btn" id="signupBtn">Sign Up</button>
+    </span>
+    <span id="userInfo" style="display: none;">
+      <span id="userEmail"></span>
+      <button id="logoutBtn" class="btn-outline" style="margin-left: 12px;">Logout</button>
+    </span>
+  </div>
+</nav>
+
+<!-- LANDING SECTION -->
+<section id="homeSection" class="parallax-hero">
+  <div class="hero">
+    <div class="hero-content">
+      <h1>Build the future with<br><span style="color:#6bc6ff;">SK-Coding</span></h1>
+      <p style="font-size:1.3rem; margin-top:1rem;">Learn programming, app dev & earn certifications</p>
+      <a href="#" data-nav="courses" class="cta-button btn">🚀 Start Learning →</a>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS animated section -->
+<section id="howItWorks">
+  <div class="container">
+    <h2 class="section-title">📘 How it works</h2>
+    <div class="steps-grid">
+      <div class="step-card"><div class="step-icon"><i class="fas fa-user-plus"></i></div><h3>1. Sign Up Free</h3><p>Create your account in seconds</p></div>
+      <div class="step-card"><div class="step-icon"><i class="fas fa-laptop-code"></i></div><h3>2. Interactive Lessons</h3><p>Live code editor + step-by-step</p></div>
+      <div class="step-card"><div class="step-icon"><i class="fas fa-chart-line"></i></div><h3>3. Track Progress</h3><p>Complete & earn certificates</p></div>
+      <div class="step-card"><div class="step-icon"><i class="fas fa-trophy"></i></div><h3>4. Challenge Mode</h3><p>Premium: Test your skills</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- COURSES SECTION -->
+<section id="coursesSection" style="display: none;">
+  <div class="container">
+    <h2 class="section-title">🎓 Our Courses</h2>
+    <div id="coursesContainer" class="courses-grid"></div>
+  </div>
+</section>
+
+<!-- DYNAMIC LESSON VIEW (hidden by default) -->
+<div id="lessonView" style="display: none;"></div>
+
+<!-- DASHBOARD / ACCOUNT -->
+<section id="dashboardSection" style="display: none;">
+  <div class="container">
+    <h2 class="section-title">👤 My Learning Hub</h2>
+    <div class="account-info" id="dashboardContent">
+      <!-- dynamic user progress -->
+    </div>
+    <div id="challengeModeArea" style="margin-top: 2rem;"></div>
+  </div>
+</section>
+
+<!-- MODALS -->
+<div id="authModal" class="modal">
+  <div class="modal-content">
+    <h3 id="modalTitle">Log In</h3>
+    <input type="email" id="authEmail" placeholder="Email">
+    <input type="password" id="authPassword" placeholder="Password">
+    <button id="submitAuthBtn" class="btn">Submit</button>
+    <p id="toggleAuthText" style="margin-top: 12px; cursor: pointer; color:#8fcbff;">Don't have an account? Sign Up</p>
+    <button id="googleAuthBtn" class="btn-outline" style="margin-top: 10px; width:100%"><i class="fab fa-google"></i> Sign in with Google</button>
+    <button id="closeModal" class="btn-outline" style="margin-top: 10px;">Cancel</button>
+  </div>
+</div>
+
+<script>
+  // ----------------------------- FIREBASE CONFIG (REPLACE WITH YOUR OWN) -------------------------
+  const firebaseConfig = {
+    apiKey: "AIzaSyDummyKeyReplaceWithYourFirebaseConfig",  // <-- Replace with actual config
+    authDomain: "sk-coding-demo.firebaseapp.com",
+    projectId: "sk-coding-demo",
+    storageBucket: "sk-coding-demo.appspot.com",
+    messagingSenderId: "123456789012",
+    appId: "1:123456789012:web:abcdef123456"
+  };
+  // For demo purposes, if config missing we show alert to replace but continue with mock? Better instruct user.
+  // We'll initialize with try/catch; additionally store fallback local for demonstration but we enforce Firebase
+  let app, auth, db;
+  try {
+    firebase.initializeApp(firebaseConfig);
+    auth = firebase.auth();
+    db = firebase.firestore();
+    console.log("Firebase initialized");
+  } catch(e) { alert("Firebase config error, please replace with your config. Using local demo fallback for preview."); }
+
+  // ----------------------------- LESSONS DATA ---------------------------------
+  const lessonsData = [
+    { id: "html_intro", title: "HTML Basics: Intro", description: "Structure of web pages", content: "HTML (HyperText Markup Language) is the standard markup language for documents designed to be displayed in a web browser.", codeInit: "<h1>Hello World</h1>\n<p>This is HTML!</p>", isPremium: false, order:1, fullText: "Learn the skeleton of websites." },
+    { id: "html_tags", title: "HTML Elements", description: "Headings, paragraphs, links", content: "Use tags like <h1> to <h6>, <p>, <a>", codeInit: "<h2>My first page</h2>\n<a href='#'>Click me</a>", isPremium: false, order:2 },
+    { id: "css_selectors", title: "CSS Basics: Selectors", description: "Color, fonts, and selectors", content: "CSS describes how HTML elements are displayed.", codeInit: "h1 { color: dodgerblue; }\np { font-size: 18px; }", isPremium: false, order:3 },
+    { id: "flexbox_premium", title: "Advanced: Flexbox", description: "Responsive layouts", content: "Master flex container properties.", codeInit: ".container { display: flex; gap: 20px; }", isPremium: true, order:4 },
+    { id: "grid_premium", title: "CSS Grid Mastery", description: "2D layouts", content: "Grid system for advanced designs.", codeInit: ".grid { display: grid; grid-template-columns: 1fr 1fr; }", isPremium: true, order:5 }
+  ];
+
+  let currentUser = null;
+  let currentPremium = false;
+  let completedLessons = []; // store ids
+  let activeLessonId = null;
+  let currentCode = "";
+
+  // Helper: update UI for auth state
+  function updateAuthUI(user) {
+    if (user) {
+      document.getElementById("authButtons").style.display = "none";
+      document.getElementById("userInfo").style.display = "inline-flex";
+      document.getElementById("userEmail").innerText = user.email;
+      loadUserProgress(user.uid);
+    } else {
+      document.getElementById("authButtons").style.display = "flex";
+      document.getElementById("userInfo").style.display = "none";
+      currentPremium = false; completedLessons = [];
+      renderCourses(); renderDashboard();
+    }
+  }
+
+  async function loadUserProgress(uid) {
+    if (!db) return;
+    const docRef = db.collection("users").doc(uid);
+    const docSnap = await docRef.get();
+    if (docSnap.exists) {
+      const data = docSnap.data();
+      completedLessons = data.completedLessons || [];
+      currentPremium = data.isPremium || false;
+    } else {
+      completedLessons = [];
+      currentPremium = false;
+      await docRef.set({ completedLessons: [], isPremium: false, email: currentUser.email });
+    }
+    renderCourses();
+    renderDashboard();
+    if (activeLessonId) renderLessonPage(activeLessonId);
+  }
+
+  async function saveProgress() {
+    if (!currentUser || !db) return;
+    await db.collection("users").doc(currentUser.uid).set({
+      completedLessons: completedLessons,
+      isPremium: currentPremium,
+      email: currentUser.email
+    }, { merge: true });
+    renderCourses(); renderDashboard();
+    if (activeLessonId) renderLessonPage(activeLessonId);
+  }
+
+  function markLessonComplete(lessonId) {
+    const lesson = lessonsData.find(l => l.id === lessonId);
+    if (!lesson) return;
+    if (lesson.isPremium && !currentPremium) { alert("Premium required to complete this lesson."); return false; }
+    if (!completedLessons.includes(lessonId)) {
+      completedLessons.push(lessonId);
+      saveProgress();
+      alert("✅ Lesson completed! Progress saved.");
+    } else alert("Lesson already completed.");
+    return true;
+  }
+
+  function renderCourses() {
+    const container = document.getElementById("coursesContainer");
+    if (!container) return;
+    container.innerHTML = "";
+    lessonsData.forEach(lesson => {
+      const isCompleted = completedLessons.includes(lesson.id);
+      const isLocked = lesson.isPremium && !currentPremium;
+      const card = document.createElement("div");
+      card.className = "course-card";
+      card.innerHTML = `
+        <h3>${lesson.title} ${isCompleted ? '✔️' : ''}</h3>
+        <p>${lesson.description}</p>
+        ${lesson.isPremium ? '<div class="premium-badge"><i class="fas fa-gem"></i> Premium</div>' : '<div class="premium-badge" style="background:#2c7da0;">Free</div>'}
+        ${isLocked ? '<div class="premium-badge locked-badge"><i class="fas fa-lock"></i> Locked</div>' : ''}
+        <button class="btn-learn btn" data-id="${lesson.id}" ${isLocked ? 'disabled' : ''}>${isLocked ? 'Upgrade to Unlock' : 'Start Lesson'}</button>
+      `;
+      const btn = card.querySelector("button");
+      if (btn && !isLocked) btn.addEventListener("click", () => startLesson(lesson.id));
+      else if (btn && isLocked) btn.addEventListener("click", () => alert("Upgrade to premium to access advanced topics!"));
+      container.appendChild(card);
+    });
+  }
+
+  function startLesson(lessonId) {
+    if (!currentUser) { alert("Please login to start lessons."); return; }
+    activeLessonId = lessonId;
+    renderLessonPage(lessonId);
+    document.querySelectorAll("section").forEach(sec => sec.style.display = "none");
+    document.getElementById("lessonView").style.display = "block";
+  }
+
+  function renderLessonPage(lessonId) {
+    const lesson = lessonsData.find(l => l.id === lessonId);
+    if (!lesson) return;
+    const isCompleted = completedLessons.includes(lessonId);
+    const isLocked = lesson.isPremium && !currentPremium;
+    if (isLocked) { alert("Premium required"); return; }
+    const container = document.getElementById("lessonView");
+    const initialCode = lesson.codeInit || "<h1>Start Coding!</h1>";
+    currentCode = initialCode;
+    container.innerHTML = `
+      <div class="lesson-page">
+        <div class="lesson-content glass-card">
+          <h2>${lesson.title}</h2>
+          <p>${lesson.content}</p>
+          <div class="progress-bar-container"><div class="progress-fill" id="lessonProgressFill" style="width: ${isCompleted ? '100%' : '0%'}"></div></div>
+          <button id="completeLessonBtn" class="btn">${isCompleted ? 'Already Completed' : '✔️ Mark as Completed'}</button>
+          <button id="backToCoursesBtn" class="btn-outline" style="margin-left:1rem">← Back to Courses</button>
+        </div>
+        <div class="code-editor-panel">
+          <h3>✏️ Live Code Editor (HTML/CSS)</h3>
+          <textarea id="liveCodeInput" class="code-input" spellcheck="false">${currentCode}</textarea>
+          <button id="runCodeBtn" class="btn" style="margin-top:8px">▶ Run / Refresh Preview</button>
+          <iframe id="previewFrame" class="preview-frame" srcdoc="<html><body>${escapeHtml(currentCode)}</body></html>"></iframe>
+        </div>
+      </div>
+    `;
+    const textarea = document.getElementById("liveCodeInput");
+    const runBtn = document.getElementById("runCodeBtn");
+    const preview = document.getElementById("previewFrame");
+    const completeBtn = document.getElementById("completeLessonBtn");
+    const backBtn = document.getElementById("backToCoursesBtn");
+
+    const updatePreview = () => {
+      let code = textarea.value;
+      preview.srcdoc = `<html><head><style>body{font-family:sans-serif; padding:1rem;}</style></head><body>${escapeHtml(code)}</body></html>`;
+    };
+    runBtn.addEventListener("click", updatePreview);
+    updatePreview();
+    if (completeBtn && !isCompleted) completeBtn.addEventListener("click", () => { markLessonComplete(lesson.id); renderLessonPage(lesson.id); });
+    else if (completeBtn && isCompleted) completeBtn.disabled = true;
+    backBtn.addEventListener("click", () => { document.getElementById("lessonView").style.display = "none"; showSection("courses"); });
+  }
+
+  function escapeHtml(str) { return str.replace(/[&<>]/g, function(m){ if(m==='&') return '&amp;'; if(m==='<') return '&lt;'; if(m==='>') return '&gt;'; return m;}); }
+
+  function renderDashboard() {
+    const dashboardDiv = document.getElementById("dashboardContent");
+    if (!dashboardDiv) return;
+    const completedCount = completedLessons.length;
+    const totalLessons = lessonsData.length;
+    const premiumLessons = lessonsData.filter(l => l.isPremium).length;
+    const allFreeCompleted = lessonsData.filter(l => !l.isPremium).every(l => completedLessons.includes(l.id));
+    const allPremiumCompleted = currentPremium ? lessonsData.filter(l => l.isPremium).every(l => completedLessons.includes(l.id)) : false;
+    const certEligible = currentPremium && allFreeCompleted && allPremiumCompleted;
+    dashboardDiv.innerHTML = `
+      <p><strong>${currentUser?.email || "Guest"}</strong> ${currentPremium ? '<span class="premium-badge" style="position:static; background:gold;">⭐ PREMIUM MEMBER</span>' : '<span class="premium-badge" style="background:#6c757d;">Free Member</span>'}</p>
+      <p>📊 Progress: ${completedCount}/${totalLessons} lessons completed</p>
+      <div class="progress-bar-container"><div class="progress-fill" style="width: ${(completedCount/totalLessons)*100}%"></div></div>
+      ${!currentPremium ? '<button id="upgradePremiumBtn" class="btn">💎 Upgrade to Premium (Demo)</button>' : '<p>✨ Premium perks: certificates, advanced lessons, challenge mode.</p>'}
+      ${certEligible ? '<button id="generateCertBtn" class="btn certificate-btn">🏆 Generate Certificate of Completion</button>' : '<p class="lock">🔒 Complete all lessons (including premium) to unlock certificate.</p>'}
+    `;
+    const upgradeBtn = document.getElementById("upgradePremiumBtn");
+    if (upgradeBtn) upgradeBtn.addEventListener("click", async () => { if(currentUser){ currentPremium=true; await saveProgress(); renderDashboard(); renderCourses(); alert("Premium enabled (demo). Refresh features.");} else alert("Login first."); });
+    const certBtn = document.getElementById("generateCertBtn");
+    if (certBtn) certBtn.addEventListener("click", () => generateCertificate());
+    const challengeDiv = document.getElementById("challengeModeArea");
+    if (currentPremium) {
+      challengeDiv.innerHTML = `<div class="glass-card" style="padding:1.5rem"><h3>🔥 Challenge Mode (Premium)</h3><p>Test your skills: Build a responsive navbar. Type your solution in code editor?</p><button id="challengeBtn" class="btn">Start Challenge Quiz</button></div>`;
+      document.getElementById("challengeBtn")?.addEventListener("click", () => alert("Challenge Mode: Replicate a flexbox menu. Premium users can earn badges! 🎖️"));
+    } else challengeDiv.innerHTML = `<div class="glass-card">⭐ Upgrade to Premium to unlock challenges & certificates.</div>`;
+  }
+
+  function generateCertificate() {
+    const canvas = document.createElement("canvas");
+    canvas.width = 800; canvas.height = 600;
+    const ctx = canvas.getContext("2d");
+    ctx.fillStyle = "#f9f3e2"; ctx.fillRect(0,0,800,600);
+    ctx.fillStyle = "#1e3c72"; ctx.font = "36px 'Inter'"; ctx.fillText("SK-Coding", 280, 100);
+    ctx.font = "24px serif"; ctx.fillStyle = "#2c3e66"; ctx.fillText("Certificate of Completion", 230, 200);
+    ctx.font = "20px 'Inter'"; ctx.fillStyle = "#000"; ctx.fillText(`Awarded to: ${currentUser?.email}`, 260, 320);
+    ctx.font = "18px"; ctx.fillStyle = "#1565C0"; ctx.fillText("For completing all core & premium lessons", 220, 420);
+    const link = document.createElement("a");
+    link.download = "SK_Coding_Certificate.png";
+    link.href = canvas.toDataURL();
+    link.click();
+    alert("Certificate downloaded! 🎉");
+  }
+
+  function showSection(sectionName) {
+    document.getElementById("homeSection").style.display = sectionName === "home" ? "block" : "none";
+    document.getElementById("howItWorks").style.display = sectionName === "home" ? "block" : "none";
+    document.getElementById("coursesSection").style.display = sectionName === "courses" ? "block" : "none";
+    document.getElementById("dashboardSection").style.display = sectionName === "dashboard" ? "block" : "none";
+    document.getElementById("lessonView").style.display = "none";
+    if(sectionName === "courses") renderCourses();
+    if(sectionName === "dashboard") renderDashboard();
+  }
+
+  // Auth modal handling
+  const modal = document.getElementById("authModal");
+  let authMode = "login"; // login or signup
+  function openAuthModal(mode) { authMode = mode; document.getElementById("modalTitle").innerText = mode === "login" ? "Log In" : "Sign Up"; modal.style.display = "flex"; }
+  document.getElementById("loginBtn").onclick = () => openAuthModal("login");
+  document.getElementById("signupBtn").onclick = () => openAuthModal("signup");
+  document.getElementById("closeModal").onclick = () => modal.style.display = "none";
+  document.getElementById("toggleAuthText").onclick = () => { authMode = authMode === "login" ? "signup" : "login"; openAuthModal(authMode); };
+  document.getElementById("submitAuthBtn").onclick = async () => {
+    const email = document.getElementById("authEmail").value;
+    const pwd = document.getElementById("authPassword").value;
+    if(!email || !pwd) return alert("Fill fields");
+    try{
+      if(authMode === "signup") await auth.createUserWithEmailAndPassword(email, pwd);
+      else await auth.signInWithEmailAndPassword(email, pwd);
+      modal.style.display = "none";
+    }catch(e){ alert(e.message); }
+  };
+  document.getElementById("googleAuthBtn").onclick = async () => {
+    const provider = new firebase.auth.GoogleAuthProvider();
+    try{ await auth.signInWithPopup(provider); modal.style.display = "none"; }catch(e){ alert(e.message); }
+  };
+  document.getElementById("logoutBtn").onclick = () => auth.signOut();
+
+  auth.onAuthStateChanged(user => { currentUser = user; updateAuthUI(user); if(!user){ showSection("home"); }else{ showSection("home"); } });
+  // navigation
+  document.querySelectorAll("[data-nav]").forEach(link => {
+    link.addEventListener("click", (e) => { e.preventDefault(); const target = link.getAttribute("data-nav"); if(target === "courses") showSection("courses"); else if(target === "dashboard") showSection("dashboard"); else showSection("home"); });
+  });
+  // default view
+  showSection("home");
+
+  // Service Worker for offline support
+  if('serviceWorker' in navigator){
+    navigator.serviceWorker.register('/sw.js').catch(err=>console.log("SW optional"));
+    // simple mock sw creation dynamic?
+    // we'll register an inline blob? For production we can embed, but offline caching demo:
+    if(!document.querySelector('#swScript')){
+      const swCode = `self.addEventListener('fetch', event => { event.respondWith(fetch(event.request).catch(() => caches.match(event.request))); });`;
+      const blob = new Blob([swCode], {type: 'application/javascript'});
+      const url = URL.createObjectURL(blob);
+      navigator.serviceWorker.register(url);
+    }
+  }
+  // local storage fallback sync
+  window.addEventListener("load", () => { if(!db) console.warn("Firestore not ready – replace config"); });
+</script>
+<footer>
+  <p>© 2025 SK-Coding — learn to code, anytime, anywhere. Transparent UI • Offline ready</p>
+</footer>
+</body>
+</html>
