@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
   <title>CHEZIYA HIGH SCHOOL - Employee System</title>
-  <!-- Firebase config placeholder (uncomment and add SDK scripts for Firebase Hosting/Auth) -->
+  <!-- Firebase config placeholder (uncomment for hosting) -->
   <!-- <script src="https://www.gstatic.com/firebasejs/10.x/firebase-app-compat.js"></script> -->
   <!-- <script src="https://www.gstatic.com/firebasejs/10.x/firebase-auth-compat.js"></script> -->
   <!-- <script src="https://www.gstatic.com/firebasejs/10.x/firebase-firestore-compat.js"></script> -->
@@ -52,19 +52,16 @@
     </div>
   </div>
 
-  <!-- MAIN APP (hidden until login) -->
+  <!-- MAIN APP -->
   <div id="appContainer" class="app-container" style="display:none;">
-    <!-- Mobile sidebar overlay -->
     <div id="sidebarOverlay" class="sidebar-overlay"></div>
-
-    <!-- Sidebar -->
     <aside id="sidebar" class="sidebar">
       <div class="sidebar-brand">
         <span class="brand-icon">🏫</span>
         <span class="brand-text">CHEZIYA HIGH</span>
       </div>
       <nav class="sidebar-nav" id="sidebarNav">
-        <a href="#" data-page="dashboard" class="nav-item active">📊 Dashboard</a>
+        <!-- Dashboard moved to bottom -->
         <a href="#" data-page="employees" class="nav-item" id="navEmployees">👥 Employees</a>
         <a href="#" data-page="departments" class="nav-item" id="navDepartments">🏛️ Departments</a>
         <a href="#" data-page="leave" class="nav-item" id="navLeave">📝 Leave</a>
@@ -72,13 +69,13 @@
         <a href="#" data-page="announcements" class="nav-item" id="navAnnouncements">📢 Announcements</a>
         <a href="#" data-page="reports" class="nav-item" id="navReports">📈 Reports</a>
         <a href="#" data-page="profile" class="nav-item" id="navProfile">👤 My Profile</a>
+        <a href="#" data-page="dashboard" class="nav-item active" id="navDashboard">📊 Dashboard</a>
       </nav>
       <div class="sidebar-footer">
         <button id="logoutBtn" class="btn btn-outline-light btn-sm btn-block">🚪 Logout</button>
       </div>
     </aside>
 
-    <!-- Main Content -->
     <main class="main-content">
       <header class="top-navbar">
         <button id="menuToggle" class="menu-toggle" aria-label="Toggle menu">☰</button>
