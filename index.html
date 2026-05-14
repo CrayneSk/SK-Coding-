@@ -1,172 +1,122 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CHEZIYA HIGH SCHOOL - Employee System</title>
-
-    <!-- ============ Firebase Config Placeholder ============ -->
-    <!-- To integrate Firebase Hosting & Authentication: -->
-    <!-- 1. Add Firebase SDK scripts here -->
-    <!-- 2. Initialize firebase.initializeApp(firebaseConfig) -->
-    <!-- 3. Use firebase.auth() for login instead of localStorage -->
-    <!-- 4. Use Firestore for data instead of localStorage -->
-    <!--
-    <script src="https://www.gstatic.com/firebasejs/10.x/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.x/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.x/firebase-firestore-compat.js"></script>
-    <script>
-        const firebaseConfig = {
-            apiKey: "YOUR_API_KEY",
-            authDomain: "YOUR_PROJECT.firebaseapp.com",
-            projectId: "YOUR_PROJECT_ID",
-            storageBucket: "YOUR_PROJECT.appspot.com",
-            messagingSenderId: "YOUR_SENDER_ID",
-            appId: "YOUR_APP_ID"
-        };
-        // firebase.initializeApp(firebaseConfig);
-        // const auth = firebase.auth();
-        // const db = firebase.firestore();
-    </script>
-    -->
-
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+  <title>CHEZIYA HIGH SCHOOL - Employee System</title>
+  <!-- Firebase config placeholder (uncomment and add SDK scripts for Firebase Hosting/Auth) -->
+  <!-- <script src="https://www.gstatic.com/firebasejs/10.x/firebase-app-compat.js"></script> -->
+  <!-- <script src="https://www.gstatic.com/firebasejs/10.x/firebase-auth-compat.js"></script> -->
+  <!-- <script src="https://www.gstatic.com/firebasejs/10.x/firebase-firestore-compat.js"></script> -->
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-
-    <!-- ==================== LOGIN SCREEN ==================== -->
-    <div id="loginScreen" class="login-screen">
-        <div class="login-container">
-            <div class="login-header">
-                <div class="login-logo">🏫</div>
-                <h1>CHEZIYA HIGH SCHOOL</h1>
-                <p>Employee Management System</p>
-            </div>
-            <form id="loginForm" class="login-form" autocomplete="off">
-                <div class="form-group">
-                    <label for="loginUsername">Username</label>
-                    <input type="text" id="loginUsername" placeholder="Enter username" required>
-                </div>
-                <div class="form-group">
-                    <label for="loginPassword">Password</label>
-                    <div class="password-wrapper">
-                        <input type="password" id="loginPassword" placeholder="Enter password" required>
-                        <button type="button" class="toggle-password" id="toggleLoginPassword" title="Show password">👁️</button>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label for="loginRole">Role</label>
-                    <select id="loginRole" required>
-                        <option value="">Select Role</option>
-                        <option value="admin">Admin</option>
-                        <option value="principal">Principal</option>
-                        <option value="teacher">Teacher</option>
-                    </select>
-                </div>
-                <button type="submit" class="btn btn-primary btn-block">🔐 Login</button>
-                <div id="loginError" class="login-error"></div>
-            </form>
-            <div class="login-demo">
-                <p><strong>Demo Credentials:</strong></p>
-                <small>Admin: admin / admin123</small><br>
-                <small>Principal: principal / principal123</small><br>
-                <small>Teacher: teacher / teacher123</small>
-            </div>
+  <!-- LOGIN SCREEN -->
+  <div id="loginScreen" class="login-screen">
+    <div class="login-container">
+      <div class="login-header">
+        <div class="login-logo">🏫</div>
+        <h1>CHEZIYA HIGH SCHOOL</h1>
+        <p>Employee Management System</p>
+      </div>
+      <form id="loginForm" class="login-form" autocomplete="off">
+        <div class="form-group">
+          <label for="loginUsername">Username</label>
+          <input type="text" id="loginUsername" placeholder="Enter username" required>
         </div>
-    </div>
-
-    <!-- ==================== MAIN APP CONTAINER ==================== -->
-    <div id="appContainer" class="app-container" style="display:none;">
-        <!-- Sidebar Overlay for mobile -->
-        <div id="sidebarOverlay" class="sidebar-overlay"></div>
-
-        <!-- Sidebar -->
-        <aside id="sidebar" class="sidebar">
-            <div class="sidebar-brand">
-                <span class="brand-icon">🏫</span>
-                <span class="brand-text">CHEZIYA HIGH</span>
-            </div>
-            <nav class="sidebar-nav" id="sidebarNav">
-                <a href="#" data-page="dashboard" class="nav-item active">
-                    <span class="nav-icon">📊</span> <span class="nav-text">Dashboard</span>
-                </a>
-                <a href="#" data-page="employees" class="nav-item" id="navEmployees">
-                    <span class="nav-icon">👥</span> <span class="nav-text">Employees</span>
-                </a>
-                <a href="#" data-page="departments" class="nav-item" id="navDepartments">
-                    <span class="nav-icon">🏛️</span> <span class="nav-text">Departments</span>
-                </a>
-                <a href="#" data-page="leave" class="nav-item" id="navLeave">
-                    <span class="nav-icon">📝</span> <span class="nav-text">Leave Management</span>
-                </a>
-                <a href="#" data-page="attendance" class="nav-item" id="navAttendance">
-                    <span class="nav-icon">⏰</span> <span class="nav-text">Attendance</span>
-                </a>
-                <a href="#" data-page="announcements" class="nav-item" id="navAnnouncements">
-                    <span class="nav-icon">📢</span> <span class="nav-text">Announcements</span>
-                </a>
-                <a href="#" data-page="reports" class="nav-item" id="navReports">
-                    <span class="nav-icon">📈</span> <span class="nav-text">Reports</span>
-                </a>
-                <a href="#" data-page="profile" class="nav-item" id="navProfile">
-                    <span class="nav-icon">👤</span> <span class="nav-text">My Profile</span>
-                </a>
-            </nav>
-            <div class="sidebar-footer">
-                <button id="logoutBtn" class="btn btn-outline-light btn-sm btn-block">🚪 Logout</button>
-            </div>
-        </aside>
-
-        <!-- Main Content -->
-        <main class="main-content">
-            <!-- Top Navbar -->
-            <header class="top-navbar">
-                <button id="menuToggle" class="menu-toggle" title="Toggle menu">☰</button>
-                <div class="navbar-title" id="navbarTitle">Dashboard</div>
-                <div class="navbar-actions">
-                    <!-- Notifications -->
-                    <div class="notification-bell" id="notificationBell">
-                        <span class="bell-icon">🔔</span>
-                        <span class="badge" id="notificationCount">0</span>
-                        <div class="notification-dropdown" id="notificationDropdown">
-                            <div class="notif-header">Notifications</div>
-                            <div class="notif-list" id="notifList">
-                                <p class="notif-empty">No notifications</p>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- User Info -->
-                    <div class="user-info">
-                        <span class="user-avatar" id="userAvatar">👤</span>
-                        <span class="user-name" id="userNameDisplay">User</span>
-                        <span class="user-role-badge" id="userRoleBadge">Role</span>
-                    </div>
-                </div>
-            </header>
-
-            <!-- Page Content Area -->
-            <div class="content-area" id="contentArea">
-                <!-- Pages will be rendered here dynamically -->
-            </div>
-        </main>
-    </div>
-
-    <!-- ==================== MODAL CONTAINER ==================== -->
-    <div id="modalOverlay" class="modal-overlay" style="display:none;">
-        <div class="modal-container" id="modalContainer">
-            <div class="modal-header">
-                <h3 id="modalTitle">Modal Title</h3>
-                <button class="modal-close" id="modalClose">✕</button>
-            </div>
-            <div class="modal-body" id="modalBody">
-                <!-- Dynamic modal content -->
-            </div>
+        <div class="form-group">
+          <label for="loginPassword">Password</label>
+          <div class="password-wrapper">
+            <input type="password" id="loginPassword" placeholder="Enter password" required>
+            <button type="button" class="toggle-password" id="toggleLoginPassword" aria-label="Show password">👁️</button>
+          </div>
         </div>
+        <div class="form-group">
+          <label for="loginRole">Role</label>
+          <select id="loginRole" required>
+            <option value="">Select Role</option>
+            <option value="admin">Admin</option>
+            <option value="principal">Principal</option>
+            <option value="teacher">Teacher</option>
+          </select>
+        </div>
+        <button type="submit" class="btn btn-primary btn-block">🔐 Login</button>
+        <div id="loginError" class="login-error"></div>
+      </form>
+      <div class="login-demo">
+        <p><strong>Demo Credentials:</strong></p>
+        <small>Admin: admin / admin123</small><br>
+        <small>Principal: principal / principal123</small><br>
+        <small>Teacher: teacher / teacher123</small>
+      </div>
     </div>
+  </div>
 
-    <!-- ==================== TOAST NOTIFICATION ==================== -->
-    <div id="toast" class="toast"></div>
+  <!-- MAIN APP (hidden until login) -->
+  <div id="appContainer" class="app-container" style="display:none;">
+    <!-- Mobile sidebar overlay -->
+    <div id="sidebarOverlay" class="sidebar-overlay"></div>
 
-    <script src="app.js"></script>
+    <!-- Sidebar -->
+    <aside id="sidebar" class="sidebar">
+      <div class="sidebar-brand">
+        <span class="brand-icon">🏫</span>
+        <span class="brand-text">CHEZIYA HIGH</span>
+      </div>
+      <nav class="sidebar-nav" id="sidebarNav">
+        <a href="#" data-page="dashboard" class="nav-item active">📊 Dashboard</a>
+        <a href="#" data-page="employees" class="nav-item" id="navEmployees">👥 Employees</a>
+        <a href="#" data-page="departments" class="nav-item" id="navDepartments">🏛️ Departments</a>
+        <a href="#" data-page="leave" class="nav-item" id="navLeave">📝 Leave</a>
+        <a href="#" data-page="attendance" class="nav-item" id="navAttendance">⏰ Attendance</a>
+        <a href="#" data-page="announcements" class="nav-item" id="navAnnouncements">📢 Announcements</a>
+        <a href="#" data-page="reports" class="nav-item" id="navReports">📈 Reports</a>
+        <a href="#" data-page="profile" class="nav-item" id="navProfile">👤 My Profile</a>
+      </nav>
+      <div class="sidebar-footer">
+        <button id="logoutBtn" class="btn btn-outline-light btn-sm btn-block">🚪 Logout</button>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <header class="top-navbar">
+        <button id="menuToggle" class="menu-toggle" aria-label="Toggle menu">☰</button>
+        <div class="navbar-title" id="navbarTitle">Dashboard</div>
+        <div class="navbar-actions">
+          <div class="notification-bell" id="notificationBell">
+            <span class="bell-icon">🔔</span>
+            <span class="badge" id="notificationCount">0</span>
+            <div class="notification-dropdown" id="notificationDropdown">
+              <div class="notif-header">Notifications</div>
+              <div class="notif-list" id="notifList"></div>
+            </div>
+          </div>
+          <div class="user-info">
+            <span class="user-avatar" id="userAvatar">👤</span>
+            <span class="user-name" id="userNameDisplay">User</span>
+            <span class="user-role-badge" id="userRoleBadge">Role</span>
+          </div>
+        </div>
+      </header>
+      <div class="content-area" id="contentArea"></div>
+    </main>
+  </div>
+
+  <!-- MODAL -->
+  <div id="modalOverlay" class="modal-overlay" style="display:none;">
+    <div class="modal-container">
+      <div class="modal-header">
+        <h3 id="modalTitle">Modal</h3>
+        <button class="modal-close" id="modalClose">✕</button>
+      </div>
+      <div class="modal-body" id="modalBody"></div>
+    </div>
+  </div>
+
+  <!-- TOAST -->
+  <div id="toast" class="toast"></div>
+
+  <script src="app.js"></script>
 </body>
 </html>
